@@ -16,6 +16,12 @@ s_helpers = SurpriseHelpers()
 tuser = 179
 tuser_neighbors = [291, 601, 147, 571, 88, 310, 311, 585, 139, 342]
 
+'''
+The objective of this script is to measure the effect of removing the opt-out user that's based on the noise algorithm on
+hir neighbors. This script complements the one in file recommender_test_case_1.py and takes the neighbors of the target
+user that were generated there.
+'''
+
 # load the ratings csv
 ratings_df = pd.read_csv(ratings_path).rename({'movieId': 'itemId'}, axis=1)
 # call the first noise algo to get the dataset with natural noise

@@ -24,9 +24,9 @@ ratings_wndf = noise.get_dataset_with_noise(ratings_df)
 # call the optout function that users the natural noise dataset
 opt_out_users = optout.get_opt_out_users(ratings_wndf)
 
-'''In this section, we will analyze the users that were considered as opt-out by the previous algorithm. 
-To do that, we will first find the neighbors of one of those users and then check the recommendations his closes neighbor got. 
-After that, we would remove the opt-out profile from the dataset and re-run the same method in order to verify that in fact 
+'''In this section, we will analyze the users that were considered as opt-out by the previous algorithm that's based on the noise filter. 
+To do that, we will first find the neighbors of one of those users and then check the recommendations his closest neighbor got. 
+After that, we will remove the opt-out profile from the dataset and re-run the same method in order to verify that in fact 
 the closest neighbor would get different ratings when the opt-out profile has been eliminated.'''
 # target opt-out user
 tuser = 179
