@@ -8,13 +8,13 @@ from surprise import Dataset
 from surprise import get_dataset_dir
 from surprise import Reader
 from datetime import datetime as dt
-from surprise_helpers import SurpriseHelpers
+from helpers import Helpers
 
-ratings_path = '../Research/datasets/ml_latest_small/ratings.csv'
+ratings_path = '../Research-old/datasets/ml_latest_small/ratings.csv'
 noise = NoiseFilter1()
-s_helpers = SurpriseHelpers()
-tuser = 179
-tuser_neighbors = [291, 601, 147, 571, 88, 310, 311, 585, 139, 342]
+s_helpers = Helpers()
+tuser = 611
+tuser_neighbors = [87, 397, 515, 25, 278, 348, 459, 575, 258, 30]
 
 '''
 The objective of this script is to measure the effect of removing the opt-out user that's based on the noise algorithm on

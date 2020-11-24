@@ -6,16 +6,15 @@ from noise_filter_1 import NoiseFilter1
 from obfuscation import Optout
 from surprise import KNNWithMeans
 from surprise import Dataset
-from surprise import get_dataset_dir
 from surprise import Reader
 from datetime import datetime as dt
-from surprise_helpers import SurpriseHelpers
+from helpers import Helpers
 
 
-ratings_path = '../Research/datasets/ml_latest_small/ratings.csv'
+ratings_path = '../Research-old/datasets/ml_latest_small/ratings.csv'
 noise = NoiseFilter1()
 optout = Optout()
-s_helpers = SurpriseHelpers()
+s_helpers = Helpers()
 
 # load the ratings csv
 ratings_df = pd.read_csv(ratings_path).rename({'movieId': 'itemId'}, axis=1)
@@ -29,7 +28,7 @@ To do that, we will first find the neighbors of one of those users and then chec
 After that, we will remove the opt-out profile from the dataset and re-run the same method in order to verify that in fact 
 the closest neighbor would get different ratings when the opt-out profile has been eliminated.'''
 # target opt-out user
-tuser = 179
+tuser = 483
 ratings_wndf['date'] = ratings_wndf['timestamp'].apply(lambda x: dt.fromtimestamp(x).date())
 tuser_df = ratings_wndf.loc[ratings_wndf['userId'] == tuser].sort_values(by=['date'])
 

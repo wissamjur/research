@@ -1,7 +1,9 @@
 from collections import defaultdict
+import pickle
 
-class SurpriseHelpers:
+class Helpers:
 
+    # function that gets top-n neighbors based on the surprise library recommender implementation 
     def get_top_n(self, predictions, n=10):
         """Return the top-N recommendation for each user from a set of predictions.
 
@@ -27,3 +29,11 @@ class SurpriseHelpers:
             top_n[uid] = user_ratings[:n]
 
         return top_n
+
+    def save_dict(self, obj, name):
+        with open('Obfuscation/output/'+ name + '.pkl', 'wb') as f:
+            pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
+
+    def load_dict(self, name):
+        with open('Obfuscation/output/' + name + '.pkl', 'rb') as f:
+            return pickle.load(f)

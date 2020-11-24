@@ -18,7 +18,7 @@ After figuring out the opt-out-user based on our formulation above, we run the s
 import pandas as pd
 from datetime import datetime as dt
 
-ratings_path = '../Research-old/datasets/ml_1m/ratings.csv'
+ratings_path = '../Research-old/datasets/ml_latest_small/ratings.csv'
 
 # load in the dataset and change the timestamps to dates
 ratings_df = pd.read_csv(ratings_path).rename({'movieId': 'itemId'}, axis=1)
