@@ -4,9 +4,9 @@ import pandas as pd
 import numpy as np
 import os.path
 
-from surprise import KNNWitethMeans
-from surprise import Datas
-from surprise import accuracy
+# from surprise import KNNWitethMeans
+from surprise import Dataset
+# from surprise import accuracy
 from surprise import Reader
 from helpers import Helpers
 from datetime import datetime as dt
