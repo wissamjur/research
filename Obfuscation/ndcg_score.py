@@ -33,27 +33,17 @@ for key, item in final_dict.items():
     scores = np.asarray([item[1]])
     ndcg = ndcg_score(true_relevance, scores)
 
-    perc_similarity = len(set(item[0]) & set(item[1])) / float(len(set(item[0]) | set(item[1]))) * 100
+    precentage_similarity = len(set(item[0]) & set(item[1])) / float(len(set(item[0]) | set(item[1]))) * 100
 
-    if perc_similarity < 60:
-      results[key] = [item,perc_similarity]
+    if precentage_similarity < 50:
+      results[key] = [item,precentage_similarity]
 
-# user_599_before = np.asarray([556, 88, 400, 25, 595, 72, 550, 515, 53, 511])
-# user_599_after = np.asarray([2, 7, 10, 11, 12, 13, 14, 26, 29, 31])
-# print(ndcg_score([user_599_before],[user_599_after]))
-
-# print(neighbors_recs[1])
 print(results)
 
-'''
-[
-  (
-    [131724, 5181, 5746, 5764, 5919, 6835, 7899, 3851, 4273, 187], 
-    [131724, 5181, 5746, 5764, 5919, 6835, 7899, 3851, 187, 113275]
-  ), 
-  0.985341358883266
-]
-'''
+
+
+
+
 
 items_df = pd.read_csv('../Research-old/datasets/ml_latest_small/movies.csv')
 ratings_df = pd.read_csv('../Research-old/datasets/ml_latest_small/ratings.csv')

@@ -4,8 +4,8 @@ import pandas as pd
 import numpy as np
 import os.path
 
-from surprise import KNNWitethMeans
-from surprise import Datas
+from surprise import KNNWithMeans
+from surprise import Dataset
 from surprise import accuracy
 from surprise import Reader
 from helpers import Helpers
@@ -13,7 +13,7 @@ from datetime import datetime as dt
 
 s_helpers = Helpers()
 
-ratings_path = '../Research-old/datasets/ml_latest_small/ratings_user_590.csv'
+ratings_path = '../Research-old/datasets/ml_latest_small/ratings.csv'
 
 ratings_df = pd.read_csv(ratings_path).rename({'movieId': 'itemId'}, axis=1)
 ratings_df['date'] = ratings_df['timestamp'].apply(lambda x: dt.fromtimestamp(x).date())
@@ -21,8 +21,8 @@ ratings_df['date'] = ratings_df['timestamp'].apply(lambda x: dt.fromtimestamp(x)
 
 # calculate the top-10 item recommendations of all users based on the original dataset
 # get the recommendations_recs dictionary that has the list of neighboras for each user
-if not os.path.exists('Obfuscation/output/predictions2_dict.pkl'):
-    tuser = 590
+if not os.path.exists('Obfuscation/output/predictions_dict.pkl'):
+    tuser = 599
 
     data = Dataset.load_from_df(ratings_df[['userId','itemId','rating']],Reader(rating_scale=(1,5)))
     # build the full trainset
@@ -52,10 +52,10 @@ if not os.path.exists('Obfuscation/output/predictions2_dict.pkl'):
     accuracy.mae(predictions)
     accuracy.rmse(predictions)
 
-    s_helpers.save_dict(neighbors_recs,'predictions2_dict')
+    s_helpers.save_dict(neighbors_recs,'predictions_dict')
 
 else:
-    neighbors_recs = s_helpers.load_dict('predictions2_dict')
+    neighbors_recs = s_helpers.load_dict('predictions_dict')
 
 # get the total ratings per user and the total days for every user
 ratings_per_day = ratings_df.groupby(['userId','date']).size().reset_index(name="ratings_per_day")
