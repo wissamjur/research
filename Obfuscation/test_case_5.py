@@ -15,7 +15,7 @@ from datetime import datetime as dt
 
 s_helpers = Helpers()
 
-ratings_path = '../Research-old/datasets/ml_latest_small/ratings.csv'
+ratings_path = 'E:/ProgramData/Dropbox/Research/Archive/Datasets/ML-Latest-Small/ml-latest-small/ratings.csv'
 
 ratings_df = pd.read_csv(ratings_path).rename({'movieId': 'itemId'}, axis=1)
 ratings_df['date'] = ratings_df['timestamp'].apply(lambda x: dt.fromtimestamp(x).date())
@@ -41,6 +41,14 @@ if not os.path.exists('Obfuscation/output/predictions_dict.pkl'):
     tuser_neighbors = [algo.trainset.to_raw_uid(id) for id in tuser_neighbors_iids]
     print("Target user neighbors: ", tuser_neighbors)
 
+    ## Get the neighbors of all users in the dataset
+    neighbors = {}
+    users_set = set(ratings_df.userId.to_list())
+    for user in users_set:
+        user_inner_id = algo.trainset.to_inner_uid(user)
+        user_neighbors_iids = algo.get_neighbors(user_inner_id, k=10)
+        neighbors[user] = [algo.trainset.to_raw_uid(id) for id in user_neighbors_iids]
+
     testset = trainset.build_anti_testset()
     predictions = algo.test(testset)
     top_n = s_helpers.get_top_n(predictions, n=10)
@@ -55,15 +63,17 @@ if not os.path.exists('Obfuscation/output/predictions_dict.pkl'):
     accuracy.rmse(predictions)
 
     s_helpers.save_dict(neighbors_recs,'predictions_dict')
+    s_helpers.save_dict(neighbors,'neighbors_dict')
 
 else:
     neighbors_recs = s_helpers.load_dict('predictions_dict')
+    print("Predictions already computed")
 
-# get the total ratings per user and the total days for every user
-ratings_per_day = ratings_df.groupby(['userId','date']).size().reset_index(name="ratings_per_day")
-days_per_user = ratings_per_day.groupby(['userId']).size().reset_index(name="days_per_user")
-# select only the users that have at least 20 rating days (metric 1)
-m1 = days_per_user[days_per_user['days_per_user'] > 15].userId.to_list()
-users_m1 = ratings_per_day[ratings_per_day['userId'].isin(m1)]
+## get the total ratings per user and the total days for every user
+# ratings_per_day = ratings_df.groupby(['userId','date']).size().reset_index(name="ratings_per_day")
+# days_per_user = ratings_per_day.groupby(['userId']).size().reset_index(name="days_per_user")
+## select only the users that have at least 20 rating days (metric 1)
+# m1 = days_per_user[days_per_user['days_per_user'] > 15].userId.to_list()
+# users_m1 = ratings_per_day[ratings_per_day['userId'].isin(m1)]
 
-users_m1.to_csv('users.csv')
+# users_m1.to_csv('users.csv')
