@@ -9,6 +9,7 @@ class NoiseFilter1:
 
     def get_dataset_with_noise(self, ratings_df):
 
+        print("Loading Noise Filter 1")
         start = time.time()
 
         # main algo variable: 
@@ -88,19 +89,19 @@ class NoiseFilter1:
 
         noise_df_final = ratings_groups_df.merge(noise_df, how='inner', on=['itemId', 'userId'])
 
-        print("\nTime taken: " + str(time.time() - start) + "\nDS size: " + str(len(dataset)))
+        print("\nTime taken: " + str(time.time() - start) + "\nDataset size: " + str(len(dataset)))
 
         return noise_df_final
         # end
 
 
-nf1 = NoiseFilter1()
-dataset_path = get_config_data()['dataset']
-ratings_df = load_ratings(dataset_path)[['userId','movieId','rating']].rename({'movieId': 'itemId'}, axis=1)
+# nf1 = NoiseFilter1()
+# dataset_path = get_config_data()['dataset']
+# ratings_df = load_ratings(dataset_path)[['userId','movieId','rating']].rename({'movieId': 'itemId'}, axis=1)
 
 
-ratings_df_noise = nf1.get_dataset_with_noise(ratings_df)
-ratings_df_noise.to_csv('NaturalNoise/output/' + get_config_data()['dataset_name'] + '_user_ratings_nf1.csv', index=False)
+# ratings_df_noise = nf1.get_dataset_with_noise(ratings_df)
+# ratings_df_noise.to_csv('NaturalNoise/output/' + get_config_data()['dataset_name'] + '_user_ratings_nf1.csv', index=False)
 
 
 ######## CUSTOM ########
