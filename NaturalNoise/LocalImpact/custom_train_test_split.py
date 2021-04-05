@@ -7,7 +7,7 @@ from surprise import Dataset
 from surprise import Reader
 from datetime import datetime as dt
 
-def train_test_split(raw_dataset):
+def mod_train_test_split(raw_dataset, remove_ratings=False):
     
     testset_df = pd.read_csv('NaturalNoise/LocalImpact/testset_local_eval.csv')
 
@@ -32,16 +32,20 @@ def train_test_split(raw_dataset):
 
     # temp code (remove user 599 target ratings from the trainset_df) This is done to measure the local-eval-after
     # we did 3 versions of the removal (1- removed all target dates below, then decreased the number of removed ratings in the peak selected days)
-    trainset_df_u599_t_removed = trainset_df[~(
-                                        (trainset_df['userId'] == 599) & (
-                                            (trainset_df['date'] == dt.date(dt(2017, 6, 27)))
-                                            # | (trainset_df['date'] == dt.date(dt(2017, 6, 26)))
-                                            # | (trainset_df['date'] == dt.date(dt(2018, 2, 20)))
-                                            # | (trainset_df['date'] == dt.date(dt(2018, 2, 21)))
-                                        )
-                                    )]
-    # trainset_df_u599_t_removed was initially trainset_df -- original trainset
-    new_train_data = Dataset.load_from_df(trainset_df_u599_t_removed[['userId', 'itemId', 'rating']], Reader(rating_scale=(1,5)))
-    trainset = new_train_data.build_full_trainset()
+    if remove_ratings:
+        trainset_df_u599_t_removed = trainset_df[~(
+                                            (trainset_df['userId'] == 599) & (
+                                                (trainset_df['date'] == dt.date(dt(2017, 6, 27)))
+                                                | (trainset_df['date'] == dt.date(dt(2017, 6, 26)))
+                                                | (trainset_df['date'] == dt.date(dt(2018, 2, 20)))
+                                                | (trainset_df['date'] == dt.date(dt(2018, 2, 21)))
+                                            )
+                                        )]
+        # trainset_df_u599_t_removed was initially trainset_df -- original trainset
+        train_data = Dataset.load_from_df(trainset_df_u599_t_removed[['userId', 'itemId', 'rating']], Reader(rating_scale=(1,5)))
+        trainset = train_data.build_full_trainset()
+    else:
+        train_data = Dataset.load_from_df(trainset_df[['userId', 'itemId', 'rating']], Reader(rating_scale=(1,5)))
+        trainset = train_data.build_full_trainset()
 
     return trainset, testset
