@@ -4,7 +4,7 @@
 from collections import defaultdict
 import pandas as pd
 
-def compute_mae_at_user(predictions):
+def compute_mae_at_user(predictions, neighbors):
 
     mae_at_user = dict()
     user_est_true = defaultdict(list)
@@ -13,8 +13,14 @@ def compute_mae_at_user(predictions):
     for uid, iid, true_r, est, _ in predictions:
         user_est_true[uid].append((iid, true_r, est))
 
-    for uid, user_ratings in user_est_true.items():
-        # calculate the mae for every user in the testset
+    for uid, user_ratings in list(user_est_true.items()): # had to add list() areound user_est_true.items() to avoid "dict changed size" error
+
+        # if there's a neighborhood (k>1), append the ratings of the nieghbors in total_user_ratings
+        for neighbor in neighbors[uid]:
+            neighbor_ratings = user_est_true[neighbor]
+            user_ratings += neighbor_ratings
+
+        # calculate the mae for every user in the testset (neighborhood cetered at the user if the neighborhood list is not empty)
         mae = (sum(abs(est - true_r) for (_, true_r, est) in user_ratings)) / len(user_ratings)
 
         mae_at_user[uid] = mae

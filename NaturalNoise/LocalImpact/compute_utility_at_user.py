@@ -40,9 +40,9 @@ def compute_ndcg_at_user(testset, predictions, n=10):
             i += 1
 
             # IDCG calculation
-            search_top_n_real = [index + 1 for index, v in enumerate(top_n_real[uid]) if v[0] == iid]
+            search_top_n_real = [index + 1 for index, v in enumerate(top_n_real[uid]) if v[0] == iid] # find the location of the item in the ground-truth rankings
             if not search_top_n_real:
-                print("item not found in the ground-truth rankings, using lowest values instead")
+                # print("item not found in the ground-truth rankings, using lowest values instead")
                 search_top_n_real = n + 1
                 utility = 1
                 item_index_in_gt = search_top_n_real
