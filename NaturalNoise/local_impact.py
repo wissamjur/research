@@ -28,8 +28,8 @@ data = Dataset.load_from_df(
                 Reader(rating_scale=(1,5))
             )
 # sample random trainset and testset (default call using Surprise library train_test_split_method)
-# (Default - surpriselib) trainset, testset = train_test_split(data, test_size=.15, shuffle=True)
-trainset, testset = mod_train_test_split(raw_ratings_df, remove_ratings=True)
+    # (Default - surpriselib) trainset, testset = train_test_split(data, test_size=.15, shuffle=True)
+trainset, testset = mod_train_test_split(raw_ratings_df, remove_ratings=False)
 
 # load a recommender algorithm: SVD, NMF or KNNWithMeans algorithm
 sim_options = {
@@ -40,7 +40,7 @@ algo = KNNWithMeans(sim_options=sim_options)
 
 # train the algorithm on the trainset, and predict ratings for the testset
 algo.fit(trainset)
-neighbors = get_top_k_neighbors(raw_ratings_df, algo, k=10)
+neighbors = get_top_k_neighbors(raw_ratings_df, algo, k=0)
 predictions = algo.test(testset)
 
 # compute MAE and RMSE
@@ -48,8 +48,8 @@ accuracy.fcp(predictions)
 accuracy.mae(predictions)
 accuracy.rmse(predictions)
 # get the accuracy at the neighborhood level (user-level)
-compute_mae_at_user(predictions, neighbors)
-compute_ndcg_at_user(testset, predictions)
+# compute_mae_at_user(predictions, neighbors)
+compute_ndcg_at_user(testset, predictions, neighbors)
 
 # 5-fold cross validation (to avoid bias)
 # cross_validate(algo, data, measures=['RMSE', 'MAE', 'FCP'], cv=5, verbose=True)

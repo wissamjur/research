@@ -2,7 +2,15 @@ from collections import defaultdict
 import pandas as pd
 import math
 
-def compute_ndcg_at_user(testset, predictions, n=10):
+'''
+    - The n parameter allows us to control the top-n ratings to be considered.
+        This allows us to calculate NDCG@5 or NDCG@10 for instance
+    - But, if we have neighborhoods in the neighborhood parameter, the we cannot consider NDCG@n.
+        That would be opposite to the point of neighborhood metric
+        It's better to consider NDCG of the whole user/user+neighborhood when considering neighborhood metric evaluation
+'''
+
+def compute_ndcg_at_user(testset, predictions, neighbors, n=1000):
 
     dcg_at_user = dict()
     idcg_at_user = dict()
@@ -10,18 +18,22 @@ def compute_ndcg_at_user(testset, predictions, n=10):
     top_n = defaultdict(list)
     top_n_real = defaultdict(list)
 
-    # map the predictions to each user
+    # map the predictions to each user (predictions of the user-item in the testset)
     for uid, iid, true_r, est, _ in predictions:
         map_users[uid].append((iid, true_r, est))
 
-    # Then sort the predictions for each user and retrieve the k highest ones
-    # This will give us the detailed prediction data for every user already sorted in a top-n manner
-    for uid, user_ratings in map_users.items():
+    # then sort the predictions for each user and retrieve the k highest ones
+    # this will give us the detailed prediction data for every user already sorted in a top-n manner
+    for uid, user_ratings in list(map_users.items()):
+        # if neighborhood evaluation is to be considered (k>1), append the ratings of the nieghbors in user_ratings
+        for neighbor in neighbors[uid]:
+            neighbor_ratings = map_users[neighbor]
+            user_ratings += neighbor_ratings
+
         user_ratings.sort(key=lambda x: x[2], reverse=True) # sort by order of highest prediction
         top_n[uid] = user_ratings[:n]
 
-    for uid, user_ratings in map_users.items():
-        user_ratings.sort(key=lambda x: x[1], reverse=True) # sort by order of highest prediction
+        user_ratings.sort(key=lambda x: x[1], reverse=True) # sort by order of highest actual rating (real values)
         top_n_real[uid] = user_ratings[:n]
 
     for uid, user_ratings in top_n.items():
@@ -40,16 +52,17 @@ def compute_ndcg_at_user(testset, predictions, n=10):
             i += 1
 
             # IDCG calculation
+                # an additional one is added (index + 1) since the index starts at 0 as the 1st position
             search_top_n_real = [index + 1 for index, v in enumerate(top_n_real[uid]) if v[0] == iid] # find the location of the item in the ground-truth rankings
             if not search_top_n_real:
                 # print("item not found in the ground-truth rankings, using lowest values instead")
                 search_top_n_real = n + 1
                 utility = 1
-                item_index_in_gt = search_top_n_real
+                item_index_in_gt = search_top_n_real # item index in ground truth ratings
             else:
                 item_index_in_gt = search_top_n_real[0]
 
-            discount_factor_real = math.log2(item_index_in_gt + 1) # an additional one is added since the search_top_n_real index starts at 0
+            discount_factor_real = math.log2(item_index_in_gt + 1)
             idcg += utility / discount_factor_real
 
         dcg_at_user[uid] = dcg
