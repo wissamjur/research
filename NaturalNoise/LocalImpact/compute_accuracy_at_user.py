@@ -3,26 +3,32 @@
 
 from collections import defaultdict
 import pandas as pd
+import numpy as np
 
 def compute_mae_at_user(predictions, neighbors):
 
     mae_at_user = dict()
-    user_est_true = defaultdict(list)
+    map_users = defaultdict(list)
 
     # map the predictions to each user
     for uid, iid, true_r, est, _ in predictions:
-        user_est_true[uid].append((iid, true_r, est))
+        map_users[uid].append((iid, true_r, est))
 
-    for uid, user_ratings in list(user_est_true.items()): # had to add list() areound user_est_true.items() to avoid "dict changed size" error
+    # append the neighborhood ratings to every user and calculate the mae at each iteration
+    for uid, user_ratings in list(map_users.items()):
 
-        # if there's a neighborhood (k>1), append the ratings of the nieghbors in total_user_ratings
+        # work on a copy of the user_ratings list rather to avoid overwriting it
+        # the copy won't work unless we use list.copy() method
+        user_neighbors_ratings = user_ratings.copy()
+
         for neighbor in neighbors[uid]:
-            neighbor_ratings = user_est_true[neighbor]
-            user_ratings += neighbor_ratings
+            neighbor_ratings = map_users[neighbor]
+            user_neighbors_ratings.extend(neighbor_ratings)
 
         # calculate the mae for every user in the testset (neighborhood cetered at the user if the neighborhood list is not empty)
-        mae = (sum(abs(est - true_r) for (_, true_r, est) in user_ratings)) / len(user_ratings)
-
+        mae = np.mean([float(abs(true_r - est))
+                    for (_, true_r, est) in user_neighbors_ratings])
+                    
         mae_at_user[uid] = mae
 
     mae_at_user_df = pd.DataFrame.from_dict(mae_at_user, orient='index').reset_index().sort_values(by=['index'])

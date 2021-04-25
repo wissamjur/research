@@ -25,16 +25,21 @@ def compute_ndcg_at_user(testset, predictions, neighbors, n=1000):
     # then sort the predictions for each user and retrieve the k highest ones
     # this will give us the detailed prediction data for every user already sorted in a top-n manner
     for uid, user_ratings in list(map_users.items()):
+
+        # work on a copy of the user_ratings list rather to avoid overwriting it
+        # the copy won't work unless we use list.copy() method
+        user_neighbors_ratings = user_ratings.copy()
+
         # if neighborhood evaluation is to be considered (k>1), append the ratings of the nieghbors in user_ratings
         for neighbor in neighbors[uid]:
             neighbor_ratings = map_users[neighbor]
-            user_ratings += neighbor_ratings
+            user_neighbors_ratings.extend(neighbor_ratings)
 
-        user_ratings.sort(key=lambda x: x[2], reverse=True) # sort by order of highest prediction
-        top_n[uid] = user_ratings[:n]
+        user_neighbors_ratings.sort(key=lambda x: x[2], reverse=True) # sort by order of highest prediction
+        top_n[uid] = user_neighbors_ratings[:n]
 
-        user_ratings.sort(key=lambda x: x[1], reverse=True) # sort by order of highest actual rating (real values)
-        top_n_real[uid] = user_ratings[:n]
+        user_neighbors_ratings.sort(key=lambda x: x[1], reverse=True) # sort by order of highest actual rating (real values)
+        top_n_real[uid] = user_neighbors_ratings[:n]
 
     for uid, user_ratings in top_n.items():
 

@@ -21,5 +21,5 @@ def get_top_k_neighbors(raw_ratings, algo, k=10):
                             for inner_id in user_neighbors)
 
         neighbors[uid] = list(user_neighbors)
-    
+
     return neighbors
